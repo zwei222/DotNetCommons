@@ -1,15 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// ---------------------------------------------------------------------
+// <copyright file="ExpressionExtensionTest.cs" company="zwei222">
+// Copyright (c) zwei222. All rights reserved.
+// </copyright>
+// ---------------------------------------------------------------------
+
+using System;
 using System.Linq.Expressions;
-using System.Text;
 using DotNetCommons.System.Linq.Expressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DotNetCommons.Tests.System.Linq.Expressions
 {
+    /// <summary>
+    /// Test class for ExpressionExtension class.
+    /// </summary>
     [TestClass]
     public class ExpressionExtensionTest
     {
+        /// <summary>
+        /// Test method for And method.
+        /// </summary>
         [TestMethod]
         public void AndTest_001()
         {
@@ -43,6 +53,9 @@ namespace DotNetCommons.Tests.System.Linq.Expressions
             }
         }
 
+        /// <summary>
+        /// Test method for Or method.
+        /// </summary>
         [TestMethod]
         public void OrTest_001()
         {
