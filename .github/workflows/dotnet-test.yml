@@ -17,4 +17,4 @@ jobs:
       with:
         dotnet-version: ${{ matrix.dotnet }}
     - name: Run MSTest
-      run: dotnet test --configuration Release
+      run: cd ./Tests && dotnet test --configuration Release
