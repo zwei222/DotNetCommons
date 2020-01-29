@@ -1,5 +1,5 @@
 # DotNetCommons
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/zwei222/DotNetCommons/.NET Core unit testing) ![GitHub](https://img.shields.io/github/license/zwei222/DotNetCommons)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/zwei222/DotNetCommons/.NET%20Core%20unit%20testing) ![GitHub](https://img.shields.io/github/license/zwei222/DotNetCommons)
 
 ## Summary
 
