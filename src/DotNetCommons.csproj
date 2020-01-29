@@ -33,9 +33,7 @@
 
   <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json" />
-    <None Include="..\LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="..\LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)"><CopyToOutputDirectory>Always</CopyToOutputDirectory>
 </None>
   </ItemGroup>
 
