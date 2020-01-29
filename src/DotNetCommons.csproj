@@ -20,15 +20,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <OutputPath>bin\Debug\netstandard2.1\</OutputPath>
-    <DocumentationFile>bin\Debug\netstandard2.1\DotNetCommons.xml</DocumentationFile>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>bin\Debug\DotNetCommons.xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <OutputPath>bin\Release\netstandard2.1\</OutputPath>
-    <DocumentationFile>bin\Release\netstandard2.1\DotNetCommons.xml</DocumentationFile>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>bin\Release\DotNetCommons.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
