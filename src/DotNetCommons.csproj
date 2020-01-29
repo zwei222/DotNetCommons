@@ -7,6 +7,14 @@
     <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <CodeAnalysisRuleSet>..\StyleCop.Analyzers.ruleset</CodeAnalysisRuleSet>
+    <PackageId>DotNetCommons</PackageId>
+    <Version>0.1.0</Version>
+    <Author>zwei_222</Author>
+    <Company>zwei222.info</Company>
+    <PackageDescription>"DotNetCommons" is a library that summarizes the processes I often use.</PackageDescription>
+    <Copyright>©zwei_222</Copyright>
+    <PackageLicenseFile>..\LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://github.com/zwei222/DotNetCommons</RepositoryUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -25,6 +33,7 @@
 
   <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json" />
+    <None Include="..\LICENSE" Pack="true" PackagePath="$(PackageLicenseFile)" />
   </ItemGroup>
 
   <ItemGroup>
