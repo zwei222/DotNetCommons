@@ -1,0 +1,25 @@
+name: dotnet pack DotNetCommons
+
+on:
+  push:
+    tags:
+      - v*.*.*
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: .NET Core setup
+      uses: actions/setup-dotnet@v1.4
+      with:
+        dotnet-version: '3.1.101'
+    - name: Make nuget package
+      run: dotnet pack --configuration Release ./src/
+    - name: Upload nuget.org
+      run: dotnet nuget push ./src/bin/Release/DotNetCommons.*.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
