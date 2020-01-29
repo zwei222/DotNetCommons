@@ -13,7 +13,7 @@
     <Company>zwei222.info</Company>
     <PackageDescription>"DotNetCommons" is a library that summarizes the processes I often use.</PackageDescription>
     <Copyright>©zwei_222</Copyright>
-    <PackageLicenseFile>..\LICENSE</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/zwei222/DotNetCommons</RepositoryUrl>
   </PropertyGroup>
 
