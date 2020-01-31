@@ -1,5 +1,5 @@
 # DotNetCommons
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/zwei222/DotNetCommons/.NET%20Core%20unit%20testing) ![GitHub](https://img.shields.io/github/license/zwei222/DotNetCommons)
+![Nuget](https://img.shields.io/nuget/v/DotNetCommons) ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/zwei222/DotNetCommons/.NET%20Core%20unit%20testing) ![GitHub](https://img.shields.io/github/license/zwei222/DotNetCommons)
 
 ## Summary
 
@@ -32,4 +32,4 @@ $ dotnet add package DotNetCommons
 
 ## Author
 
-[@zwei_222]()
+[@zwei_222](https://twitter.com/zwei_222)
