@@ -61,12 +61,18 @@ namespace DotNetCommons.Utilities
         /// </summary>
         private static readonly sbyte[] Base64UrlDecodingTable;
 
+        /// <summary>
+        /// UTF-8 Encoding
+        /// </summary>
+        private static readonly Encoding UTF8Encoding;
+
         static Base64()
         {
             Base64UTF8EncodingTable = BuildUtf8EncodingTable(Base64EncodingTable);
             Base64UTF8UrlEncodingTable = BuildUtf8EncodingTable(Base64UrlEncodingTable);
             Base64DecodingTable = BuildDecodingTable(Base64EncodingTable);
             Base64UrlDecodingTable = BuildDecodingTable(Base64UrlEncodingTable);
+            UTF8Encoding = Encoding.UTF8;
         }
 
         /// <summary>
@@ -212,6 +218,142 @@ namespace DotNetCommons.Utilities
         }
 
         /// <summary>
+        /// Encodes a character string into BASE64 format.(UTF-8)
+        /// </summary>
+        /// <param name="source">Source string.</param>
+        /// <returns>BASE64 format string.</returns>
+        public static string EncodeUtf8(string source)
+        {
+            var sourceBytes = UTF8Encoding.GetBytes(source);
+
+            return Encode(sourceBytes);
+        }
+
+        /// <summary>
+        /// Encode the byte array to BASE64 format.(UTF-8)
+        /// </summary>
+        /// <param name="source">Source byte array.</param>
+        /// <returns>BASE64 format string.</returns>
+        public static string EncodeUtf8(byte[] source)
+        {
+            var buffers = ArrayPool<byte>.Shared.Rent(GetEncodedLength(source.Length));
+
+            try
+            {
+                var bufferSpan = buffers.AsSpan();
+
+                TryEncodeUtf8(source, bufferSpan, out var result);
+
+                return UTF8Encoding.GetString(bufferSpan.Slice(0, result));
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffers);
+            }
+        }
+
+        /// <summary>
+        /// Decodes a character string from BASE64 format.(UTF-8)
+        /// </summary>
+        /// <param name="source">BASE64 string.</param>
+        /// <returns>Source string.</returns>
+        public static string DecodeUtf8(string source)
+        {
+            return DecodeUtf8(source.Select(character => (byte)character).ToArray());
+        }
+
+        /// <summary>
+        /// Decode the byte array from BASE64 format.(UTF-8)
+        /// </summary>
+        /// <param name="sourceSpan">BASE64 char Span.</param>
+        /// <returns>Source string.</returns>
+        public static string DecodeUtf8(ReadOnlySpan<byte> sourceSpan)
+        {
+            var buffers = ArrayPool<byte>.Shared.Rent(GetDecodedLength(sourceSpan.Length));
+
+            try
+            {
+                var bufferSpan = buffers.AsSpan();
+
+                TryDecodeUtf8(sourceSpan, bufferSpan, out var result);
+
+                return UTF8Encoding.GetString(bufferSpan.Slice(0, result));
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffers);
+            }
+        }
+
+        /// <summary>
+        /// Encodes a character string into BASE64 URL format.(UTF-8)
+        /// </summary>
+        /// <param name="source">Source string.</param>
+        /// <returns>BASE64 URL format string.</returns>
+        public static string EncodeUtf8Url(string source)
+        {
+            var sourceBytes = UTF8Encoding.GetBytes(source);
+
+            return EncodeUtf8Url(sourceBytes);
+        }
+
+        /// <summary>
+        /// Encode the byte array to BASE64 URL format.(UTF-8)
+        /// </summary>
+        /// <param name="source">Source byte array.</param>
+        /// <returns>BASE64 URL format string.</returns>
+        public static string EncodeUtf8Url(byte[] source)
+        {
+            var buffers = ArrayPool<byte>.Shared.Rent(GetEncodedUrlLength(source.Length));
+
+            try
+            {
+                var bufferSpan = buffers.AsSpan();
+
+                TryEncodeUtf8Url(source, bufferSpan, out var result);
+
+                return UTF8Encoding.GetString(bufferSpan.Slice(0, result));
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffers);
+            }
+        }
+
+        /// <summary>
+        /// Decodes a character string from BASE64 URL format.(UTF-8)
+        /// </summary>
+        /// <param name="source">BASE64 URL string.</param>
+        /// <returns>Source string.</returns>
+        public static string DecodeUtf8Url(string source)
+        {
+            return DecodeUtf8Url(source.Select(character => (byte)character).ToArray());
+        }
+
+        /// <summary>
+        /// Decode the byte array from BASE64 URL format.(UTF-8)
+        /// </summary>
+        /// <param name="sourceSpan">BASE64 URL byte Span.</param>
+        /// <returns>Source string.</returns>
+        public static string DecodeUtf8Url(ReadOnlySpan<byte> sourceSpan)
+        {
+            var buffers = ArrayPool<byte>.Shared.Rent(GetDecodedUrlLength(sourceSpan.Length));
+
+            try
+            {
+                var bufferSpan = buffers.AsSpan();
+
+                TryDecodeUtf8Url(sourceSpan, bufferSpan, out var result);
+
+                return UTF8Encoding.GetString(bufferSpan.Slice(0, result));
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffers);
+            }
+        }
+
+        /// <summary>
         /// Encode the contents of Span to BASE64 format.
         /// </summary>
         /// <param name="byteSpan">Byte array of character strings.</param>
@@ -279,6 +421,74 @@ namespace DotNetCommons.Utilities
             }
         }
 
+        /// <summary>
+        /// Encode the contents of Span to BASE64 format.(UTF-8)
+        /// </summary>
+        /// <param name="byteSpan">Byte array of character strings.</param>
+        /// <param name="utf8ByteSpan">Encoding buffer.</param>
+        /// <param name="result">Character string length after encoding.</param>
+        /// <returns>A boolean value indicating whether encoding is complete.</returns>
+        public static bool TryEncodeUtf8(ReadOnlySpan<byte> byteSpan, Span<byte> utf8ByteSpan, out int result)
+        {
+            fixed (byte* input = &MemoryMarshal.GetReference(byteSpan))
+            fixed (byte* output = &MemoryMarshal.GetReference(utf8ByteSpan))
+            {
+                result = EncodeBase64(input, output, 0, byteSpan.Length, Base64UTF8EncodingTable, true);
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Decode the contents of Span from BASE64 format.(UTF-8)
+        /// </summary>
+        /// <param name="utf8Bytes">Encoding buffer.</param>
+        /// <param name="byteSpan">Byte array of character strings.</param>
+        /// <param name="result">Character string length after encoding.</param>
+        /// <returns>A boolean value indicating whether encoding is complete.</returns>
+        public static bool TryDecodeUtf8(ReadOnlySpan<byte> utf8Bytes, Span<byte> byteSpan, out int result)
+        {
+            fixed (byte* input = &MemoryMarshal.GetReference(utf8Bytes))
+            fixed (byte* output = &MemoryMarshal.GetReference(byteSpan))
+            {
+                return DecodeBase64(input, output, 0, utf8Bytes.Length, Base64DecodingTable, true, out result);
+            }
+        }
+
+        /// <summary>
+        /// Encode the contents of Span to BASE64 URL format.(UTF-8)
+        /// </summary>
+        /// <param name="byteSpan">Byte array of character strings.</param>
+        /// <param name="utf8ByteSpan">Encoding buffer.</param>
+        /// <param name="result">Character string length after encoding.</param>
+        /// <returns>A boolean value indicating whether encoding is complete.</returns>
+        public static bool TryEncodeUtf8Url(ReadOnlySpan<byte> byteSpan, Span<byte> utf8ByteSpan, out int result)
+        {
+            fixed (byte* input = &MemoryMarshal.GetReference(byteSpan))
+            fixed (byte* output = &MemoryMarshal.GetReference(utf8ByteSpan))
+            {
+                result = EncodeBase64(input, output, 0, byteSpan.Length, Base64UTF8UrlEncodingTable, false);
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Decode the contents of Span from BASE64 URL format.(UTF-8)
+        /// </summary>
+        /// <param name="utf8Bytes">Encoding buffer.</param>
+        /// <param name="byteSpan">Byte array of character strings.</param>
+        /// <param name="result">Character string length after encoding.</param>
+        /// <returns>A boolean value indicating whether encoding is complete.</returns>
+        public static bool TryDecodeUtf8Url(ReadOnlySpan<byte> utf8Bytes, Span<byte> byteSpan, out int result)
+        {
+            fixed (byte* input = &MemoryMarshal.GetReference(utf8Bytes))
+            fixed (byte* output = &MemoryMarshal.GetReference(byteSpan))
+            {
+                return DecodeBase64(input, output, 0, utf8Bytes.Length, Base64UrlDecodingTable, false, out result);
+            }
+        }
+
         private static int EncodeBase64(byte* bytes, char* chars, int offset, int length, char[] table, bool padding)
         {
             var modulo = length % 3;
@@ -327,6 +537,66 @@ namespace DotNetCommons.Utilities
                     {
                         chars[charIndex + 2] = '=';
                         chars[charIndex + 3] = '=';
+                        charIndex += 4;
+                    }
+                    else
+                    {
+                        charIndex += 2;
+                    }
+                }
+
+                return charIndex;
+            }
+        }
+
+        private static int EncodeBase64(byte* inBytes, byte* outBytes, int offset, int length, byte[] table, bool padding)
+        {
+            var modulo = length % 3;
+            var loopLength = offset + (length - modulo);
+            var index = 0;
+            var charIndex = 0;
+
+            fixed (byte* encodingTable = &table[0])
+            {
+                for (index = offset; index < loopLength; index += 3)
+                {
+                    outBytes[charIndex] = encodingTable[(inBytes[index] & 0b11111100) >> 2];
+                    outBytes[charIndex + 1] =
+                        encodingTable[(inBytes[index] & 0b00000011) << 4 | (inBytes[index + 1] & 0b11110000) >> 4];
+                    outBytes[charIndex + 2] =
+                        encodingTable[(inBytes[index + 1] & 0b00001111) << 2 | (inBytes[index + 2] & 0b11000000) >> 6];
+                    outBytes[charIndex + 3] = encodingTable[inBytes[index + 2] & 0b00111111];
+                    charIndex += 4;
+                }
+
+                index = loopLength;
+
+                if (modulo == 2)
+                {
+                    outBytes[charIndex] = encodingTable[(inBytes[index] & 0b11111100) >> 2];
+                    outBytes[charIndex + 1] =
+                        encodingTable[(inBytes[index] & 0b00000011) << 4 | (inBytes[index + 1] & 0b11110000) >> 4];
+                    outBytes[charIndex + 2] = encodingTable[(inBytes[index + 1] & 0b00001111) << 2];
+
+                    if (padding)
+                    {
+                        outBytes[charIndex + 3] = (byte)'=';
+                        charIndex += 4;
+                    }
+                    else
+                    {
+                        charIndex += 3;
+                    }
+                }
+                else if (modulo == 1)
+                {
+                    outBytes[charIndex] = encodingTable[(inBytes[index] & 0b11111100) >> 2];
+                    outBytes[charIndex + 1] = encodingTable[(inBytes[index] & 0b00000011) << 4];
+
+                    if (padding)
+                    {
+                        outBytes[charIndex + 2] = (byte)'=';
+                        outBytes[charIndex + 3] = (byte)'=';
                         charIndex += 4;
                     }
                     else
@@ -564,6 +834,240 @@ namespace DotNetCommons.Utilities
                         var result0 = (byte)((index0 & 0b00111111) << 2);
 
                         bytes[byteIndex] = result0;
+                        byteIndex += 1;
+                        result = byteIndex;
+
+                        return true;
+                    }
+                }
+            }
+        }
+
+        private static bool DecodeBase64(
+            byte* inBytes,
+            byte* outBytes,
+            int offset,
+            int length,
+            sbyte[] table,
+            bool padding,
+            out int result)
+        {
+            if (length == 0)
+            {
+                result = 0;
+
+                return true;
+            }
+
+            var loopLength = offset + length - 4;
+            var index = 0;
+            var byteIndex = 0;
+
+            fixed (sbyte* decodingTable = &table[0])
+            {
+                for (index = offset; index < loopLength;)
+                {
+                    ref var index0 = ref decodingTable[inBytes[index]];
+                    ref var index1 = ref decodingTable[inBytes[index + 1]];
+                    ref var index2 = ref decodingTable[inBytes[index + 2]];
+                    ref var index3 = ref decodingTable[inBytes[index + 3]];
+
+                    if (((index0 | index1 | index2 | index3) & 0b10000000) == 0b10000000)
+                    {
+                        result = 0;
+
+                        return false;
+                    }
+
+                    var result0 = (byte)(((index0 & 0b00111111) << 2) | ((index1 & 0b00110000) >> 4));
+                    var result1 = (byte)(((index1 & 0b00001111) << 4) | ((index2 & 0b00111100) >> 2));
+                    var result2 = (byte)(((index2 & 0b00000011) << 6) | (index3 & 0b00111111));
+
+                    outBytes[byteIndex] = result0;
+                    outBytes[byteIndex + 1] = result1;
+                    outBytes[byteIndex + 2] = result2;
+                    index += 4;
+                    byteIndex += 3;
+                }
+
+                var restLength = length - index;
+
+                if (padding)
+                {
+                    if (restLength != 4)
+                    {
+                        result = 0;
+
+                        return false;
+                    }
+
+                    {
+                        ref var index0 = ref decodingTable[inBytes[index]];
+                        ref var index1 = ref decodingTable[inBytes[index + 1]];
+                        ref var index2 = ref decodingTable[inBytes[index + 2]];
+                        ref var index3 = ref decodingTable[inBytes[index + 3]];
+
+                        if (index3 == -2)
+                        {
+                            if (index2 == -2)
+                            {
+                                if (index1 == -2)
+                                {
+                                    if (index0 == -2)
+                                    {
+                                        // No processing.
+                                    }
+
+                                    result = 0;
+
+                                    return false;
+                                }
+
+                                {
+                                    if (!IsValid(ref index0, ref index1))
+                                    {
+                                        result = 0;
+
+                                        return false;
+                                    }
+
+                                    var result0 = (byte)((index0 & 0b00111111) << 2 | (index1 & 0b00110000) >> 4);
+
+                                    outBytes[byteIndex] = result0;
+                                    byteIndex += 1;
+                                    result = byteIndex;
+
+                                    return true;
+                                }
+                            }
+
+                            {
+                                if (!IsValid(ref index0, ref index1, ref index2))
+                                {
+                                    result = 0;
+
+                                    return false;
+                                }
+
+                                var result0 = (byte)((index0 & 0b00111111) << 2 | (index1 & 0b00110000) >> 4);
+                                var result1 = (byte)((index1 & 0b00001111) << 4 | (index2 & 0b00111100) >> 2);
+
+                                outBytes[byteIndex] = result0;
+                                outBytes[byteIndex + 1] = result1;
+                                byteIndex += 2;
+                                result = byteIndex;
+
+                                return true;
+                            }
+                        }
+                        else
+                        {
+                            if (!IsValid(ref index0, ref index1, ref index2, ref index3))
+                            {
+                                result = 0;
+
+                                return false;
+                            }
+
+                            var result0 = (byte)((index0 & 0b00111111) << 2 | (index1 & 0b00110000) >> 4);
+                            var result1 = (byte)((index1 & 0b00001111) << 4 | (index2 & 0b00111100) >> 2);
+                            var result2 = (byte)((index2 & 0b00000011) << 6 | (index3 & 0b00111111));
+
+                            outBytes[byteIndex] = result0;
+                            outBytes[byteIndex + 1] = result1;
+                            outBytes[byteIndex + 2] = result2;
+                            byteIndex += 3;
+                            result = byteIndex;
+
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    if (restLength == 4)
+                    {
+                        ref var index0 = ref decodingTable[inBytes[index]];
+                        ref var index1 = ref decodingTable[inBytes[index + 1]];
+                        ref var index2 = ref decodingTable[inBytes[index + 2]];
+                        ref var index3 = ref decodingTable[inBytes[index + 3]];
+
+                        if (!IsValid(ref index0, ref index1, ref index2, ref index3))
+                        {
+                            result = 0;
+
+                            return false;
+                        }
+
+                        var result0 = (byte)((index0 & 0b00111111) << 2 | (index1 & 0b00110000) >> 4);
+                        var result1 = (byte)((index1 & 0b00001111) << 4 | (index2 & 0b00111100) >> 2);
+                        var result2 = (byte)((index2 & 0b00000011) << 6 | (index3 & 0b00111111));
+
+                        outBytes[byteIndex] = result0;
+                        outBytes[byteIndex + 1] = result1;
+                        outBytes[byteIndex + 2] = result2;
+                        byteIndex += 3;
+                        result = byteIndex;
+
+                        return true;
+                    }
+                    else if (restLength == 3)
+                    {
+                        ref var index0 = ref decodingTable[inBytes[index]];
+                        ref var index1 = ref decodingTable[inBytes[index + 1]];
+                        ref var index2 = ref decodingTable[inBytes[index + 2]];
+
+                        if (!IsValid(ref index0, ref index1, ref index2))
+                        {
+                            result = 0;
+
+                            return false;
+                        }
+
+                        var result0 = (byte)((index0 & 0b00111111) << 2 | (index1 & 0b00110000) >> 4);
+                        var result1 = (byte)((index1 & 0b00001111) << 4 | (index2 & 0b00111100) >> 2);
+
+                        outBytes[byteIndex] = result0;
+                        outBytes[byteIndex + 1] = result1;
+                        byteIndex += 2;
+                        result = byteIndex;
+
+                        return true;
+                    }
+                    else if (restLength == 2)
+                    {
+                        ref var index0 = ref decodingTable[inBytes[index]];
+                        ref var index1 = ref decodingTable[inBytes[index + 1]];
+
+                        if (!IsValid(ref index0, ref index1))
+                        {
+                            result = 0;
+
+                            return false;
+                        }
+
+                        var result0 = (byte)((index0 & 0b00111111) << 2 | (index1 & 0b00110000) >> 4);
+
+                        outBytes[byteIndex] = result0;
+                        byteIndex += 1;
+                        result = byteIndex;
+
+                        return true;
+                    }
+                    else
+                    {
+                        ref var index0 = ref decodingTable[inBytes[index]];
+
+                        if (!IsValid(ref index0))
+                        {
+                            result = 0;
+
+                            return false;
+                        }
+
+                        var result0 = (byte)((index0 & 0b00111111) << 2);
+
+                        outBytes[byteIndex] = result0;
                         byteIndex += 1;
                         result = byteIndex;
 
