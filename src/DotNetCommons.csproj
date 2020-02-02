@@ -8,13 +8,14 @@
     <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
     <CodeAnalysisRuleSet>..\StyleCop.Analyzers.ruleset</CodeAnalysisRuleSet>
     <PackageId>DotNetCommons</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Author>zwei_222</Author>
     <Company>zwei222.info</Company>
     <PackageDescription>"DotNetCommons" is a library that summarizes the processes I often use.</PackageDescription>
     <Copyright>©zwei_222</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <RepositoryUrl>https://github.com/zwei222/DotNetCommons</RepositoryUrl>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
