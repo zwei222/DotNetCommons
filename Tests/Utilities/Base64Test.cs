@@ -79,7 +79,7 @@ namespace DotNetCommons.Tests.Utilities
                 .Replace('-', '+').Replace('_', '/');
 
             var expected = encoding.GetString(Convert.FromBase64String(expectedSource.ToString()));
-            var actual = Base64.DecodeUrl(expectedSource.ToString(), encoding);
+            var actual = Base64.DecodeUrl(source, encoding);
 
             Assert.AreEqual(expected, actual);
             Assert.AreEqual(original, actual);
